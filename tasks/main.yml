@@ -12,21 +12,9 @@
 - name: "Distribution specific variables"
   include_vars: main.yml
 
-- name: "CentOS tasks"
-  include: CentOS.yml
-  when: ansible_distribution  == "CentOS"
-
 - name: "Debian tasks"
   include: Debian.yml
   when: ansible_distribution  == "Debian"
-
-- name: "Red Hat tasks"
-  include: RedHat.yml
-  when: ansible_distribution  == "RedHat"
-
-- name: "Ubuntu tasks"
-  include: Ubuntu.yml
-  when: ansible_distribution  == "Ubuntu"
 
 - name: Generate Consul key
   shell: PATH=/usr/local/bin:$PATH consul keygen
@@ -59,6 +47,7 @@
 
 - name: Consul client directory
   file: "dest=/etc/consul.d/client state=directory owner={{ consul_user }} group={{ consul_group}}"
+  when: consul_client_mode == "true"
 
 - name: Consul bootstrap configuration
   template: src=server_bootstrap_config.json.j2 dest={{ consul_config_path }}/bootstrap/config.json
@@ -68,10 +57,7 @@
 
 - name: Consul client configuration
   template: src=client_config.json.j2 dest={{ consul_config_path }}/client/config.json
-
-- name: SYSV init script
-  template: src=consul_sysvinit.j2 dest=/etc/init.d/consul owner=root group=root mode=755
-  when: not ansible_distribution == "Debian"
+  when: consul_client_mode == "true"
 
 - name: Debian init script
   template: src=consul_debian.init.j2 dest=/etc/init.d/consul owner=root group=root mode=755
@@ -108,8 +94,8 @@
 
 - name: "Enable dnsmasq"
   include: ../tasks/dnsmasq.yml
-  when: consul_dnsmasq == "true"
+  when: consul_dnsmasq == "true" and consul_client_mode != "true"
 
 - name: "Restart dnsmasq"
   service: name=dnsmasq state=restarted
-  when: consul_dnsmasq == "true"
+  when: consul_dnsmasq == "true" and consul_client_mode != "true"

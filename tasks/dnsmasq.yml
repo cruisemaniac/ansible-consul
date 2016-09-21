@@ -2,11 +2,6 @@
 # File: tasks/main.yml - dnsmasq tasks for Consul
 
 - name: dnsmasq package
-  yum: name=dnsmasq state=present
-  when: ansible_distribution  == "CentOS" or ansible_distribution  == "RedHat"
-  tags: dnsmasq,installation
-
-- name: dnsmasq package
   apt: name=dnsmasq state=present
   when: ansible_distribution  == "Debian" or ansible_distribution  == "Ubuntu"
   tags: dnsmasq,installation

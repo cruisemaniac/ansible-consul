@@ -17,7 +17,6 @@ consul_debian_url: "{{ consul_zip_url }}"
 consul_debian_sha256: "{{ consul_zip_sha256 }}"
 
 consul_debian_os_packages:
-  - git
   - unzip
 
 # Red Hat vars
